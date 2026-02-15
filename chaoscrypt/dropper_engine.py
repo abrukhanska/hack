@@ -38,6 +38,7 @@ REPORT_HTML_PATH = os.path.join(LOG_DIR, "full_report.html")
 PHASES = [
     ("system_hooks", "🪝 System Hooks (Dropper/Persistence)"),
     ("network_monitor", "📡 Network Monitor (Exfil/C2 demo)"),
+    ("c2_commander", "🎯 C2 Commander (Exfil/Recon/Beacon)"),
     ("file_agent", "🕵️ File Agent (Integrity/Watermark)"),
     ("show_case", "🟢 Show phase (Ransomware)"),
     ("stealth_case", "🔵 Stealth phase (Persistence)"),
@@ -75,11 +76,9 @@ def run_phase(phase_name, phase_desc):
 
         print("[DROP] ▶️ auto_analyzer (INLINE Nuclear Option)...")
         try:
-            # 1. Генеруємо файли (без TG всередині)
             html_path, csv_path, json_path = generate_reports_only()
             print(f"[DROP] Reports: HTML={os.path.isfile(html_path)} CSV={os.path.isfile(csv_path)} JSON={os.path.isfile(json_path)}")
 
-            # 2. Відправляємо ТУТ через send_document дроппера
             if send_document:
                 for ftype, path in [("HTML", html_path), ("CSV", csv_path), ("JSON", json_path)]:
                     if os.path.isfile(path):
@@ -131,6 +130,8 @@ def run_phase(phase_name, phase_desc):
         phase_timeout = 8
     elif phase_name == "antidote":
         phase_timeout = 60
+    elif phase_name == "c2_commander":
+        phase_timeout = 90
     else:
         phase_timeout = timeout_sec
 

