@@ -26,9 +26,6 @@ SANDBOX_INDICATORS = [
 ]
 
 def wow_sandbox_detect(logger=None):
-    """
-    Визначає чи середовище sandbox/VM. Логує результат для DFIR (logger якщо є).
-    """
     verdict = []
     for indicator in SANDBOX_INDICATORS:
         if os.path.exists(indicator) or indicator.lower() in platform.platform().lower():
@@ -40,9 +37,6 @@ def wow_sandbox_detect(logger=None):
     return verdict
 
 def wow_add_autorun_entry(exename, entry_name="ChaosCryptAgent", logger=None):
-    """
-    Додає себе/інший exe до автозапуску (WinReg only!).
-    """
     if not IS_WINDOWS:
         if logger: logger.log_event("chaos", "Autorun set skipped: not Windows")
         return False
@@ -58,9 +52,6 @@ def wow_add_autorun_entry(exename, entry_name="ChaosCryptAgent", logger=None):
         return False
 
 def wow_remove_autorun_entry(entry_name="ChaosCryptAgent", logger=None):
-    """
-    Видаляє запис з автозапуску (BlueTeam remediation!).
-    """
     if not IS_WINDOWS:
         if logger: logger.log_event("remediation", "Autorun remove skipped: not Windows")
         return False
@@ -76,9 +67,6 @@ def wow_remove_autorun_entry(entry_name="ChaosCryptAgent", logger=None):
         return False
 
 def wow_dropper_manifest(drop_path, phase_name, drop_files=None, drop_message="WOW Infection Dropper active!", logger=None):
-    """
-    Симулює dropper — створює маніфест-файл (для teach/DFIR)
-    """
     try:
         manifest = {
             "manifest_time": int(time.time()),
@@ -98,9 +86,6 @@ def wow_dropper_manifest(drop_path, phase_name, drop_files=None, drop_message="W
         return None
 
 def wow_infection_simulation(target_dir, logger=None):
-    """
-    Симулює підкидання артефактів/файлів для wow-teach/CTF.
-    """
     try:
         note_path = os.path.join(target_dir, RANSOM_NOTE_NAME)
         qr_path = os.path.join(target_dir, RANSOM_QR_NAME)
@@ -119,19 +104,15 @@ def wow_infection_simulation(target_dir, logger=None):
 
 if __name__ == "__main__":
     print("*** ChaosCrypt system_hooks (Diamond teach/BlueTeam/RedTeam) ***")
-    # WOW: тест логування, створюємо логер phase із show
     from chaoscrypt.logbook import LogBook
     logger = LogBook(phase="show")
-    # Sandbox/VM detection
     verdict = wow_sandbox_detect(logger=logger)
     print("Sandbox indicators detected:", verdict)
-    # Автозапуск+dropper тест (тільки на Windows)
     if IS_WINDOWS:
         exe = sys.executable
         wow_add_autorun_entry(exe, entry_name="ChaosCryptAgent", logger=logger)
         time.sleep(0.5)
         wow_remove_autorun_entry(entry_name="ChaosCryptAgent", logger=logger)
-    # Dropper infection simulation (Target_Show)
     mf, files = wow_infection_simulation(os.path.join(ROOT_DIR,"Target_Show"), logger=logger)
     print("Dropper Manifest:", mf)
     print("Dropped Files:", files)

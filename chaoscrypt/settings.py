@@ -77,6 +77,7 @@ IMG_LOGO_REPORT  = "chaos_logo_whitebg.jpg"
 IMG_LOGO_SYSTEM  = "chaos_logo_transparent.png"
 IMG_SUCCESS      = "chaoscrypt_success.jpg"
 IMG_ICO_NAME     = "chaos_icon.ico"
+DECOY_PDF_NAME   = "decoy_report.pdf"
 
 ALL_PHASES = (
     'system_hooks', 'dropper', 'network', 'c2', 'agent', 'chaos', 'payment', 'show', 'stealth', 'antidote', 'recovery'

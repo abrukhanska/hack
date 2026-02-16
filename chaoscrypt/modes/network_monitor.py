@@ -6,7 +6,6 @@ import threading
 import datetime
 import shutil
 
-# WOW-import-fix: DRY з settings
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
@@ -23,10 +22,8 @@ except ImportError:
     send_message = None
     send_photo = None
 
-# === Фазова змінна (for DFIR/logbook)
 PHASE = "network"
 
-# Додати phase до settings.py (LOGFILES та TXT_LOGS)
 NETWORK_LOG_PATH = LOGFILES.get(PHASE, os.path.join(LOG_DIR, "master_network.jsonl"))
 NETWORK_TXT_LOG = TXT_LOGS.get(PHASE, os.path.join(LOG_DIR, "network_monitor.log"))
 
@@ -36,9 +33,6 @@ PCAP_FOLDER = os.path.join(LOG_DIR, "net_pcap")
 os.makedirs(PCAP_FOLDER, exist_ok=True)
 
 class SimpleC2Server(threading.Thread):
-    """
-    Симпл мережевий "C2" сервер на локалці для DEMO (teach/CTF осередок).
-    """
     def __init__(self, port, logbook):
         super().__init__(daemon=True)
         self.port = port
@@ -75,18 +69,12 @@ class SimpleC2Server(threading.Thread):
         self.running = False
 
 def save_pcap_sim(data_bytes, filename="netcap_demo.pcap"):
-    """
-    Симулює "PCAP" — зберігає raw трафік для teach/BlueTeam з аналізу.
-    """
     cap_path = os.path.join(PCAP_FOLDER, filename)
     with open(cap_path, "ab") as f:
         f.write(data_bytes)
     return cap_path
 
 def wow_exfil_sim(logbook, exfil_path):
-    """
-    Wow: Симуляція мережевого витоку даних та TG-репорт.
-    """
     try:
         with open(exfil_path, "rb") as f:
             exfil_bytes = f.read()
@@ -108,19 +96,16 @@ def run_network_monitor():
     logbook.log_event("info", "Network Monitor started")
     srv = SimpleC2Server(port=SERVER_PORT, logbook=logbook)
     srv.start()
-    # WOW: демо-файл для витоку (можна підкинути .txt/.png для teach)
     demo_exfil_path = os.path.join(ASSETS_DIR, "demo_exfil.txt")
     if os.path.exists(demo_exfil_path):
         wow_exfil_sim(logbook, demo_exfil_path)
     else:
-        # Просто демо exfil через зображення-логотип
         logo_path = os.path.join(ASSETS_DIR, IMG_LOGO_SYSTEM)
         if os.path.exists(logo_path):
             wow_exfil_sim(logbook, logo_path)
     try:
         if send_message:
             send_message(f"🌐 [Network] C2 DEMO server active on port {SERVER_PORT}", async_mode=False)
-        # Працює у teach-режимі, чекає на вхідні demo-трафіки ~10сек після запуску
         time.sleep(SERVER_TIMEOUT_SEC)
     finally:
         srv.stop()

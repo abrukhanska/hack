@@ -14,8 +14,6 @@ try:
 except ImportError:
     send_message = None
 
-
-# --- Async telegram notifications (one worker, no spam)
 class TelegramNotifier:
     _queue = queue.Queue()
     _worker_started = False
@@ -35,7 +33,6 @@ class TelegramNotifier:
                 send_message(text, parse_mode=parse_mode, async_mode=False)
             except Exception:
                 pass
-
 
 class LogbookEvent:
     def __init__(self, phase, event_type, msg, metadata=None, tag=None,
@@ -69,7 +66,6 @@ class LogbookEvent:
         if self.recommendation: base += f"\n  Recommendation: {self.recommendation}"
         if self.source: base += f"\n  Source: {self.source}"
         return base
-
 
 class LogBook:
     def __init__(self, phase: str, log_path_override=None):
@@ -108,7 +104,6 @@ class LogBook:
         self.fp_txt = self._rotate_file(self.txt_path, self.fp_txt)
 
     def log(self, event: LogbookEvent):
-        # 1. Запис у файли (завжди повний лог)
         data = event.as_dict()
         text = event.as_text()
         with self._lock:
@@ -120,32 +115,23 @@ class LogBook:
                 with open(PARSE_ERROR_LOG, 'a', encoding='utf-8') as ef:
                     ef.write(f"Log I/O error: {e}\n")
 
-        # 2. Фільтрований Telegram Notify (Розумна фільтрація)
         if TELEGRAM_AUTO_NOTIFY and send_message:
-            # Список типів, які ВАРТО слати в Telegram
-            # Примітка: 'encryption' тут немає, бо ми шлемо summary вручну з show_case.py
             important_types = {
                 "fail", "finish", "phase", "dropper", "summary",
                 "IOC", "network", "recommendation", "remediation", "exfiltration"
             }
 
-            # Також пропускаємо, якщо є теги CRITICAL або IOC
             has_urgent_tag = event.tag and ("critical" in event.tag.lower() or "ioc" in event.tag.lower())
             is_important = (event.event_type in important_types)
 
             if is_important or has_urgent_tag:
-                # 2.1. Формуємо красивий HTML
                 msg = f"<b>[{self.phase.upper()}]</b> {html.escape(event.msg)}"
 
-                # 2.2. === ДОДАНО: Екстракція важливих метаданих ===
-                # Щоб бачити PID, назви процесів, шляхи в повідомленні
                 if event.metadata:
-                    # Вибираємо тільки ключові поля, щоб не захаращувати чат
                     key_fields = ('pid', 'process', 'exe', 'file', 'count', 'rc', 'key', 'reg_key')
                     meta_str = ""
                     for k, v in event.metadata.items():
                         if k in key_fields or 'path' in k:
-                            # Обрізаємо довгі шляхи
                             val_str = str(v)
                             if len(val_str) > 40: val_str = "..." + val_str[-37:]
                             meta_str += f"\n  └ <code>{k}: {val_str}</code>"
@@ -174,7 +160,6 @@ class LogBook:
         self.fp_txt.flush()
         self.fp_txt.close()
 
-    # ... (get_events, combine_events, export_timeline_... залишаються без змін) ...
     def get_events(self):
         if not os.path.exists(self.jsonl_path): return
         with open(self.jsonl_path, 'r', encoding='utf-8') as jf:
@@ -207,9 +192,6 @@ class LogBook:
 
     @staticmethod
     def export_timeline_html(out_file=None, phases=None):
-        # ... (код з попереднього повідомлення) ...
-        # (для економії місця, якщо він у тебе вже є, можна не дублювати,
-        #  головне - оновлений метод log)
         from collections import defaultdict
         phases = phases or ALL_PHASES
         grps = defaultdict(list)
@@ -277,7 +259,6 @@ class LogBook:
                 first = False
             f.write("\n]\n")
         return outp
-
 
 if __name__ == "__main__":
     # Test run

