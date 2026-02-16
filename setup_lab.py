@@ -66,7 +66,7 @@ project_structure = {
     # --- assets ---
     "assets/bonus.pdf": None,
     "assets/pdf.ico": None,
-    "assets/infected_wall.bmp": None,
+    "assets/infected_wall.jpg": None,
     "assets/chaos_logo.png": None,
     "assets/payment_qr.png": None,
     "assets/fake_invoice.txt": "Fake Invoice Content Placeholder",
