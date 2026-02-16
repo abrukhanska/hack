@@ -37,6 +37,7 @@ LOGFILES = {
     'agent':        os.path.join(LOG_DIR, 'master_agent.jsonl'),
     'c2':           os.path.join(LOG_DIR, 'master_c2.jsonl'),
     'chaos':        os.path.join(LOG_DIR, 'master_chaos.jsonl'),
+    'payment':      os.path.join(LOG_DIR, 'master_payment.jsonl'),
 }
 
 PARSE_ERROR_LOG = os.path.join(LOG_DIR, 'parsing_errors.log')
@@ -51,6 +52,7 @@ TXT_LOGS = {
     'agent':        os.path.join(LOG_DIR, 'agent_file.log'),
     'c2':           os.path.join(LOG_DIR, 'c2_commander.log'),
     'chaos':        os.path.join(LOG_DIR, 'chaos_effects.log'),
+    'payment':      os.path.join(LOG_DIR, 'payment_flow.log'),
 }
 
 ROTATE_MAX_BYTES = 50 * 1024 * 1024
@@ -77,7 +79,7 @@ IMG_SUCCESS      = "chaoscrypt_success.jpg"
 IMG_ICO_NAME     = "chaos_icon.ico"
 
 ALL_PHASES = (
-    'system_hooks', 'dropper', 'network', 'c2', 'agent', 'chaos', 'show', 'stealth', 'antidote', 'recovery'
+    'system_hooks', 'dropper', 'network', 'c2', 'agent', 'chaos', 'payment', 'show', 'stealth', 'antidote', 'recovery'
 )
 
 __all__ = [

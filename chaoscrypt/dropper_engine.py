@@ -43,6 +43,7 @@ PHASES = [
     ("chaos_effects", "🎭 Chaos Effects (Visual/Teaching)"),
     ("show_case", "🟢 Show phase (Ransomware)"),
     ("stealth_case", "🔵 Stealth phase (Persistence)"),
+    ("payment_flow", "💰 Payment Flow (Ransom/Key Delivery)"),
     ("antidote", "🛡️ Antidote (BlueTeam Cleanup)"),
     ("auto_analyzer", "📊 DFIR Analyzer / Timeline"),
 ]
@@ -106,7 +107,6 @@ def run_phase(phase_name, phase_desc):
             return {"name": phase_name, "desc": phase_desc, "ok": False,
                     "time": datetime.datetime.now(datetime.timezone.utc).isoformat()}
 
-    # === Всі інші фази через subprocess ===
     abspath = find_phase_script(phase_name)
     if not abspath:
         msg = f"[DROP] ❌ Phase '{phase_desc}' not found!"
@@ -135,6 +135,8 @@ def run_phase(phase_name, phase_desc):
         phase_timeout = 90
     elif phase_name == "chaos_effects":
         phase_timeout = 90
+    elif phase_name == "payment_flow":
+        phase_timeout = 120
     else:
         phase_timeout = timeout_sec
 
